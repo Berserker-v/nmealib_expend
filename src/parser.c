@@ -1,37 +1,24 @@
 /*
- * This file is part of nmealib.
  *
- * Copyright (c) 2008 Timur Sinitsyn
- * Copyright (c) 2011 Ferry Huberts
+ * NMEA library
+ * URL: http://nmea.sourceforge.net
+ * Author: Tim (xtimor@gmail.com)
+ * Licence: http://www.gnu.org/licenses/lgpl.html
+ * $Id: parser.c 17 2008-03-11 11:56:11Z xtimor $
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
  * \file parser.h
  */
 
-#include <nmea/parser.h>
+#include "nmea/tok.h"
+#include "nmea/parse.h"
+#include "nmea/parser.h"
+#include "nmea/context.h"
 
-#include <stdlib.h>
-#include <stddef.h>
 #include <string.h>
-
-#include <nmea/config.h>
-#include <nmea/context.h>
-#include <nmea/parse.h>
-#include <nmea/sentence.h>
+#include <stdlib.h>
 
 typedef struct _nmeaParserNODE
 {
@@ -77,11 +64,8 @@ int nmea_parser_init(nmeaPARSER *parser)
  */
 void nmea_parser_destroy(nmeaPARSER *parser)
 {
-    NMEA_ASSERT(parser);
-    if (parser->buffer) {
-    	free(parser->buffer);
-    	parser->buffer = NULL;
-    }
+    NMEA_ASSERT(parser && parser->buffer);
+    free(parser->buffer);
     nmea_parser_queue_clear(parser);
     memset(parser, 0, sizeof(nmeaPARSER));
 }
@@ -123,8 +107,6 @@ int nmea_parse(
             break;
         case GPVTG:
             nmea_GPVTG2info((nmeaGPVTG *)pack, info);
-            break;
-        default:
             break;
         };
 

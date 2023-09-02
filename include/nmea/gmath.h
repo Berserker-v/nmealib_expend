@@ -1,27 +1,17 @@
 /*
- * This file is part of nmealib.
  *
- * Copyright (c) 2008 Timur Sinitsyn
- * Copyright (c) 2011 Ferry Huberts
+ * NMEA library
+ * URL: http://nmea.sourceforge.net
+ * Author: Tim (xtimor@gmail.com)
+ * Licence: http://www.gnu.org/licenses/lgpl.html
+ * $Id: gmath.h 17 2008-03-11 11:56:11Z xtimor $
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __NMEA_GMATH_H__
 #define __NMEA_GMATH_H__
 
-#include <nmea/info.h>
+#include "info.h"
 
 #define NMEA_PI                     (3.141592653589793)             /**< PI value */
 #define NMEA_PI180                  (NMEA_PI / 180)                 /**< PI division by 180 */

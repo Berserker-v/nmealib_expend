@@ -1,24 +1,14 @@
 /*
- * This file is part of nmealib.
  *
- * Copyright (c) 2008 Timur Sinitsyn
- * Copyright (c) 2011 Ferry Huberts
+ * NMEA library
+ * URL: http://nmea.sourceforge.net
+ * Author: Tim (xtimor@gmail.com)
+ * Licence: http://www.gnu.org/licenses/lgpl.html
+ * $Id: sentence.c 17 2008-03-11 11:56:11Z xtimor $
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <nmea/sentence.h>
+#include "nmea/sentence.h"
 
 #include <string.h>
 
@@ -61,4 +51,21 @@ void nmea_zero_GPVTG(nmeaGPVTG *pack)
     pack->dec_m = 'M';
     pack->spn_n = 'N';
     pack->spk_k = 'K';
+}
+
+void nmea_zero_GPGLL(nmeaGPGLL *pack)
+{
+    memset(pack, 0, sizeof(nmeaGPGLL));
+    nmea_time_now(&pack->utc);
+    pack->status = 'V';
+    pack->ns = 'N';
+    pack->ew = 'E';
+}
+
+void nmea_zero_GPZDA(nmeaGPZDA *pack)
+{
+    memset(pack, 0, sizeof (nmeaGPZDA));
+    nmea_time_now(&pack->utc);
+    pack->hour_zone = 0x00;
+    pack->min_zone = 0x00;
 }

@@ -1,41 +1,28 @@
 /*
- * This file is part of nmealib.
  *
- * Copyright (c) 2008 Timur Sinitsyn
- * Copyright (c) 2011 Ferry Huberts
+ * NMEA library
+ * URL: http://nmea.sourceforge.net
+ * Author: Tim (xtimor@gmail.com)
+ * Licence: http://www.gnu.org/licenses/lgpl.html
+ * $Id: tok.c 17 2008-03-11 11:56:11Z xtimor $
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*! \file tok.h */
 
-#include <nmea/tok.h>
+#include "nmea/tok.h"
 
-#include <ctype.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
 #include <string.h>
-
-#include <nmea/config.h>
+#include <limits.h>
 
 #define NMEA_TOKS_COMPARE   (1)
 #define NMEA_TOKS_PERCENT   (2)
 #define NMEA_TOKS_WIDTH     (3)
 #define NMEA_TOKS_TYPE      (4)
-
-#define NMEA_CONVSTR_BUF    (256)
 
 /**
  * \brief Calculate control sum of binary buffer
@@ -157,7 +144,6 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...)
             width = 0;
             beg_fmt = format;
             tok_type = NMEA_TOKS_WIDTH;
-            /* no break */
         case NMEA_TOKS_WIDTH:
             if(isdigit(*format))
                 break;
@@ -166,7 +152,6 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...)
                 if(format > beg_fmt)
                     width = nmea_atoi(beg_fmt, (int)(format - beg_fmt), 10);
             }
-            /* no break */
         case NMEA_TOKS_TYPE:
             beg_tok = buff;
 
@@ -220,8 +205,6 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...)
                 if(width && 0 != (parg_target))
                     *((double *)parg_target) = nmea_atof(beg_tok, width);
                 break;
-            default:
-                break;
             };
 
             if(parg_target)
@@ -255,9 +238,6 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...)
                 goto fail;
             };
 
-            break;
-
-        default:
             break;
         };
     }

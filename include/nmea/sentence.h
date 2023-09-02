@@ -1,21 +1,11 @@
 /*
- * This file is part of nmealib.
  *
- * Copyright (c) 2008 Timur Sinitsyn
- * Copyright (c) 2011 Ferry Huberts
+ * NMEA library
+ * URL: http://nmea.sourceforge.net
+ * Author: Tim (xtimor@gmail.com)
+ * Licence: http://www.gnu.org/licenses/lgpl.html
+ * $Id: sentence.h 17 2008-03-11 11:56:11Z xtimor $
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*! \file */
@@ -23,8 +13,7 @@
 #ifndef __NMEA_SENTENCE_H__
 #define __NMEA_SENTENCE_H__
 
-#include <nmea/info.h>
-#include <nmea/time.h>
+#include "info.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -40,7 +29,9 @@ enum nmeaPACKTYPE
     GPGSA   = 0x0002,   /**< GSA - GPS receiver operating mode, SVs used for navigation, and DOP values. */
     GPGSV   = 0x0004,   /**< GSV - Number of SVs in view, PRN numbers, elevation, azimuth & SNR values. */
     GPRMC   = 0x0008,   /**< RMC - Recommended Minimum Specific GPS/TRANSIT Data. */
-    GPVTG   = 0x0010    /**< VTG - Actual track made good and speed over ground. */
+    GPVTG   = 0x0010,   /**< VTG - Actual track made good and speed over ground. */
+    GPGLL   = 0x0020,   /**< GLL - Geographic Position - Latitude/Longitude. */
+    GPZDA   = 0x0040    /**< ZDA - Time & Date. */
 };
 
 /**
@@ -126,11 +117,39 @@ typedef struct _nmeaGPVTG
 
 } nmeaGPVTG;
 
+/**
+ * GLL packet information structure
+ */
+typedef struct _nmeaGPGLL
+{
+    double  lat;        /**< Latitude in NDEG - [degree][min].[sec/60] */
+    char    ns;         /**< [N]orth or [S]outh */
+    double  lon;        /**< Longitude in NDEG - [degree][min].[sec/60] */
+    char    ew;         /**< [E]ast or [W]est */
+    nmeaTIME utc;       /**< UTC of position */
+    char    status;     /**< Status (A = active or V = void) */
+    char    mode;       /**< Mode indicator of fix type (A = autonomous, D = differential, E = estimated, N = not valid, S = simulator) */
+
+} nmeaGPGLL;
+
+/**
+ * ZDA packet information structure
+ */
+typedef struct _nmeaGPZDA
+{
+    nmeaTIME utc;       /**< UTC of position include date and time */
+    char hour_zone;     /**< Hour of local time zone */
+    char min_zone;      /**< Minue of local time zone */
+
+} nmeaGPZDA;
+
 void nmea_zero_GPGGA(nmeaGPGGA *pack);
 void nmea_zero_GPGSA(nmeaGPGSA *pack);
 void nmea_zero_GPGSV(nmeaGPGSV *pack);
 void nmea_zero_GPRMC(nmeaGPRMC *pack);
 void nmea_zero_GPVTG(nmeaGPVTG *pack);
+void nmea_zero_GPGLL(nmeaGPGLL *pack);
+void nmea_zero_GPZDA(nmeaGPZDA *pack);
 
 #ifdef  __cplusplus
 }

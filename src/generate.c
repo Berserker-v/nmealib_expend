@@ -1,34 +1,26 @@
 /*
- * This file is part of nmealib.
  *
- * Copyright (c) 2008 Timur Sinitsyn
- * Copyright (c) 2011 Ferry Huberts
+ * NMEA library
+ * URL: http://nmea.sourceforge.net
+ * Author: Tim (xtimor@gmail.com)
+ * Licence: http://www.gnu.org/licenses/lgpl.html
+ * $Id: generate.c 17 2008-03-11 11:56:11Z xtimor $
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <nmea/generate.h>
+#include "nmea/tok.h"
+#include "nmea/sentence.h"
+#include "nmea/generate.h"
+#include "nmea/units.h"
 
+#include <string.h>
+#include <stdlib.h>
 #include <math.h>
-
-#include <nmea/tok.h>
-#include <nmea/units.h>
 
 int nmea_gen_GPGGA(char *buff, int buff_sz, nmeaGPGGA *pack)
 {
     return nmea_printf(buff, buff_sz,
-        "$GPGGA,%02d%02d%02d.%02d,%09.4f,%C,%010.4f,%C,%1d,%02d,%03.1f,%03.1f,%C,%03.1f,%C,%03.1f,%04d",
+        "$GPGGA,%02d%02d%02d.%02d,%07.4f,%C,%07.4f,%C,%1d,%02d,%03.1f,%03.1f,%C,%03.1f,%C,%03.1f,%04d",
         pack->utc.hour, pack->utc.min, pack->utc.sec, pack->utc.hsec,
         pack->lat, pack->ns, pack->lon, pack->ew,
         pack->sig, pack->satinuse, pack->HDOP, pack->elv, pack->elv_units,
@@ -63,7 +55,7 @@ int nmea_gen_GPGSV(char *buff, int buff_sz, nmeaGPGSV *pack)
 int nmea_gen_GPRMC(char *buff, int buff_sz, nmeaGPRMC *pack)
 {
     return nmea_printf(buff, buff_sz,
-        "$GPRMC,%02d%02d%02d.%02d,%C,%09.4f,%C,%010.4f,%C,%03.1f,%03.1f,%02d%02d%02d,%03.1f,%C,%C",
+        "$GPRMC,%02d%02d%02d.%02d,%C,%07.4f,%C,%07.4f,%C,%03.1f,%03.1f,%02d%02d%02d,%03.1f,%C,%C",
         pack->utc.hour, pack->utc.min, pack->utc.sec, pack->utc.hsec,
         pack->status, pack->lat, pack->ns, pack->lon, pack->ew,
         pack->speed, pack->direction,

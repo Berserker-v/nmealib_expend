@@ -1,38 +1,29 @@
 /*
- * This file is part of nmealib.
  *
- * Copyright (c) 2008 Timur Sinitsyn
- * Copyright (c) 2011 Ferry Huberts
+ * NMEA library
+ * URL: http://nmea.sourceforge.net
+ * Author: Tim (xtimor@gmail.com)
+ * Licence: http://www.gnu.org/licenses/lgpl.html
+ * $Id: gmath.c 17 2008-03-11 11:56:11Z xtimor $
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*! \file gmath.h */
 
-#include <nmea/gmath.h>
+#include "nmea/gmath.h"
 
 #include <math.h>
-
-#include <nmea/config.h>
+#include <float.h>
 
 /**
+ * \fn nmea_degree2radian
  * \brief Convert degree to radian
  */
 double nmea_degree2radian(double val)
 { return (val * NMEA_PI180); }
 
 /**
+ * \fn nmea_radian2degree
  * \brief Convert radian to degree
  */
 double nmea_radian2degree(double val)
@@ -43,9 +34,9 @@ double nmea_radian2degree(double val)
  */
 double nmea_ndeg2degree(double val)
 {
-    double deg;
-    double fra_part = modf(val / 100.0, &deg);
-    return (deg + ((fra_part * 100.0) / 60.0));
+    double deg = ((int)(val / 100));
+    val = deg + (val - deg * 100) / 60;
+    return val;
 }
 
 /**
@@ -53,18 +44,22 @@ double nmea_ndeg2degree(double val)
  */
 double nmea_degree2ndeg(double val)
 {
-    double deg;
-    double fra_part = modf(val, &deg);
-    return ((deg * 100.0) + (fra_part * 60.0));
+    double int_part;
+    double fra_part;
+    fra_part = modf(val, &int_part);
+    val = int_part * 100 + fra_part * 60;
+    return val;
 }
 
 /**
+ * \fn nmea_ndeg2radian
  * \brief Convert NDEG (NMEA degree) to radian
  */
 double nmea_ndeg2radian(double val)
 { return nmea_degree2radian(nmea_ndeg2degree(val)); }
 
 /**
+ * \fn nmea_radian2ndeg
  * \brief Convert radian to NDEG (NMEA degree)
  */
 double nmea_radian2ndeg(double val)
@@ -168,13 +163,14 @@ double nmea_distance_ellipsoid(
     while ((delta_lambda > 1e-12) && (remaining_steps > 0)) 
     { /* Iterate */
         /* Variables */
-        double tmp1, tmp2, sin_alpha, cos_alpha, C, lambda_prev;
+        double tmp1, tmp2, tan_sigma, sin_alpha, cos_alpha, C, lambda_prev; 
 
         /* Calculation */
         tmp1 = cos_U2 * sin_lambda;
         tmp2 = cos_U1 * sin_U2 - sin_U1 * cos_U2 * cos_lambda;  
         sin_sigma = sqrt(tmp1 * tmp1 + tmp2 * tmp2);                
         cos_sigma = sin_U1 * sin_U2 + cos_U1 * cos_U2 * cos_lambda;   
+        tan_sigma = sin_sigma / cos_sigma;                  
         sin_alpha = cos_U1 * cos_U2 * sin_lambda / sin_sigma;  
         cos_alpha = cos(asin(sin_alpha));                 
         sqr_cos_alpha = cos_alpha * cos_alpha;                     
@@ -265,7 +261,7 @@ int nmea_move_horz_ellipsoid(
     /* Variables */
     double f, a, b, sqr_a, sqr_b;
     double phi1, tan_U1, sin_U1, cos_U1, s, alpha1, sin_alpha1, cos_alpha1;
-    double sigma1, sin_alpha, sqr_cos_alpha, sqr_u, A, B;
+    double tan_sigma1, sigma1, sin_alpha, cos_alpha, sqr_cos_alpha, sqr_u, A, B;
     double sigma_initial, sigma, sigma_prev, sin_sigma, cos_sigma, cos_2_sigmam, sqr_cos_2_sigmam, delta_sigma;
     int remaining_steps;
     double tmp1, phi2, lambda, C, L;
@@ -297,9 +293,11 @@ int nmea_move_horz_ellipsoid(
     alpha1 = azimuth;
     sin_alpha1 = sin(alpha1);
     cos_alpha1 = cos(alpha1);
+    tan_sigma1 = tan_U1 / cos_alpha1;
     sigma1 = atan2(tan_U1, cos_alpha1);
     sin_alpha = cos_U1 * sin_alpha1;
     sqr_cos_alpha = 1 - sin_alpha * sin_alpha;
+    cos_alpha = sqrt(sqr_cos_alpha);
     sqr_u = sqr_cos_alpha * (sqr_a - sqr_b) / sqr_b; 
     A = 1 + sqr_u / 16384 * (4096 + sqr_u * (-768 + sqr_u * (320 - 175 * sqr_u)));
     B = sqr_u / 1024 * (256 + sqr_u * (-128 + sqr_u * (74 - 47 * sqr_u)));

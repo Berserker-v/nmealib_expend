@@ -1,31 +1,24 @@
 /*
- * This file is part of nmealib.
  *
- * Copyright (c) 2008 Timur Sinitsyn
- * Copyright (c) 2011 Ferry Huberts
+ * NMEA library
+ * URL: http://nmea.sourceforge.net
+ * Author: Tim (xtimor@gmail.com)
+ * Licence: http://www.gnu.org/licenses/lgpl.html
+ * $Id: generator.c 17 2008-03-11 11:56:11Z xtimor $
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <nmea/generator.h>
+#include "nmea/gmath.h"
+#include "nmea/generate.h"
+#include "nmea/generator.h"
+#include "nmea/context.h"
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
-#include <nmea/context.h>
-#include <nmea/generate.h>
-#include <nmea/gmath.h>
+#if defined(NMEA_WIN) && defined(_MSC_VER)
+# pragma warning(disable: 4100) /* unreferenced formal parameter */
+#endif
 
 double nmea_random(double min, double max)
 {
@@ -124,14 +117,12 @@ int nmea_generate_from(
  * NOISE generator
  */
 
-int nmea_igen_noise_init(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info __attribute__ ((unused)))
+int nmea_igen_noise_init(nmeaGENERATOR *gen, nmeaINFO *info)
 {
     return 1;
 }
 
-int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info)
+int nmea_igen_noise_loop(nmeaGENERATOR *gen, nmeaINFO *info)
 {
     int it;
     int in_use;
@@ -168,8 +159,7 @@ int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
     return 1;
 }
 
-int nmea_igen_noise_reset(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info __attribute__ ((unused)))
+int nmea_igen_noise_reset(nmeaGENERATOR *gen, nmeaINFO *info)
 {
     return 1;
 }
@@ -178,15 +168,13 @@ int nmea_igen_noise_reset(nmeaGENERATOR *gen __attribute__ ((unused)),
  * STATIC generator
  */
 
-int nmea_igen_static_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info)
+int nmea_igen_static_loop(nmeaGENERATOR *gen, nmeaINFO *info)
 {
     nmea_time_now(&info->utc);
     return 1;
 };
 
-int nmea_igen_static_reset(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info)
+int nmea_igen_static_reset(nmeaGENERATOR *gen, nmeaINFO *info)
 {
     info->satinfo.inuse = 4;
     info->satinfo.inview = 4;
@@ -232,8 +220,7 @@ int nmea_igen_static_init(nmeaGENERATOR *gen, nmeaINFO *info)
  * SAT_ROTATE generator
  */
 
-int nmea_igen_rotate_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info)
+int nmea_igen_rotate_loop(nmeaGENERATOR *gen, nmeaINFO *info)
 {
     int it;
     int count = info->satinfo.inview;
@@ -252,8 +239,7 @@ int nmea_igen_rotate_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
     return 1;
 };
 
-int nmea_igen_rotate_reset(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info)
+int nmea_igen_rotate_reset(nmeaGENERATOR *gen, nmeaINFO *info)
 {
     int it;
     double deg = 360 / 8;
@@ -289,8 +275,7 @@ int nmea_igen_rotate_init(nmeaGENERATOR *gen, nmeaINFO *info)
  * POS_RANDMOVE generator
  */
 
-int nmea_igen_pos_rmove_init(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info)
+int nmea_igen_pos_rmove_init(nmeaGENERATOR *gen, nmeaINFO *info)
 {    
     info->sig = 3;
     info->fix = 3;
@@ -299,8 +284,7 @@ int nmea_igen_pos_rmove_init(nmeaGENERATOR *gen __attribute__ ((unused)),
     return 1;
 }
 
-int nmea_igen_pos_rmove_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
-		nmeaINFO *info)
+int nmea_igen_pos_rmove_loop(nmeaGENERATOR *gen, nmeaINFO *info)
 {
     nmeaPOS crd;
 
@@ -326,7 +310,7 @@ int nmea_igen_pos_rmove_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
     return 1;
 };
 
-int nmea_igen_pos_rmove_destroy(nmeaGENERATOR *gen __attribute__ ((unused)))
+int nmea_igen_pos_rmove_destroy(nmeaGENERATOR *gen)
 {
     return 1;
 };
@@ -386,8 +370,7 @@ nmeaGENERATOR * __nmea_create_generator(int type, nmeaINFO *info)
             gen->destroy_call = &nmea_igen_pos_rmove_destroy;
         }
         break;
-    default:
-    /* case NMEA_GEN_ROTATE: */
+    case NMEA_GEN_ROTATE:
         gen = __nmea_create_generator(NMEA_GEN_SAT_ROTATE, info);
         nmea_gen_add(gen, __nmea_create_generator(NMEA_GEN_POS_RANDMOVE, info));
         break;
@@ -410,3 +393,7 @@ void nmea_destroy_generator(nmeaGENERATOR *gen)
 {
     nmea_gen_destroy(gen);
 }
+
+#if defined(NMEA_WIN) && defined(_MSC_VER)
+# pragma warning(default: 4100)
+#endif
